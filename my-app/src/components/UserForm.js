@@ -1,11 +1,19 @@
-import React from'react';
+import React, {useState, useEffect} from'react';
 import {withFormik, Form, Field} from 'formik';
 import * as yup from 'yup';
+import axios from 'axios';
 
 
-const UserForm = ({errors, touched}) => {
-  
-console.log(errors)
+const UserForm = ({errors, touched, status}) => {
+  console.log(status)
+  const [users, setUsers] = useState ([])
+
+  useEffect(() => {
+      if (status) {
+    setUsers([ ...users, status ])
+    }
+    }, [users, status])
+
     return (
 
         
@@ -57,6 +65,14 @@ console.log(errors)
                 <br></br>
 
                 <button type = "sumbit">Submit</button>
+
+                {/* Name {status.name}<br />
+                Email {status.email}<br />
+                Terms? {status.terms}<br />  */}
+
+                {users.map((users) => ( 
+                    <div>Name: {users.name}</div>
+                ))}
         </Form>
     )
 }
@@ -80,7 +96,14 @@ export default withFormik ({
         terms: yup.boolean().required()
     }),
 
-    handleSubmit: (values) => {
-        console.log(values)
+    handleSubmit: (values, {setStatus}) => {
+        // https://reqres.in/api/users
+       axios.post('https://reqres.in/api/users', values)
+       .then((res) => {
+           console.log(res)
+       })
+       .catch((err) => {
+           console.log('Error:', err)
+       })
     }
  }) (UserForm)
